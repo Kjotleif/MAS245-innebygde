@@ -5,21 +5,45 @@
  * Author : isakk
  */ 
 
-#define F_CPU 100000UL
+#define F_CPU 4000000UL
 #include <avr/io.h>
 #include <util/delay.h>
 
 
 int main(void)
 {
-	DDRD = (1<<PD0);
-	int time = 0;
-    /* Replace with your application code */
-	PORTD |= (1<<PD0);
-    while (1) 
-    {
-		PORTD ^= (1<<PD0);
-		_delay_ms(1000);
-    }
+	DDRD = (1 << PD0);
+
+	while (1)
+	{
+		for (int i = 0; i < 100; i++)
+		{
+
+			PORTD = (1 << PD0);
+
+			for (int j = 0; j < 100 - i; j++)
+			_delay_us(500);
+
+			PORTD = 0;
+
+			for (int j = 0; j < i; j++)
+			_delay_us(500);
+		}
+		
+		
+		for (int i = 100; i > 0; i--)
+		{
+
+			PORTD = (1 << PD0);
+
+			for (int j = 0; j < 100 - i; j++)
+			_delay_us(500);
+
+			PORTD = 0;
+
+			for (int j = 0; j < i; j++)
+			_delay_us(500);
+		}
+	}
 }
 

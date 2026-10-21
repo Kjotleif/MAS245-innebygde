@@ -3,27 +3,29 @@ GccApplication1.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  000000f8  2**0
+  0 .data         00000000  00800100  00800100  00000184  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000000a4  00000000  00000000  00000054  2**1
+  1 .text         00000130  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  000000f8  2**0
+  2 .comment      00000030  00000000  00000000  00000184  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000128  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001b4  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000020  00000000  00000000  00000164  2**0
+  4 .debug_aranges 00000020  00000000  00000000  000001f0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000713  00000000  00000000  00000184  2**0
+  5 .debug_info   00000840  00000000  00000000  00000210  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000682  00000000  00000000  00000897  2**0
+  6 .debug_abbrev 00000693  00000000  00000000  00000a50  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   0000025a  00000000  00000000  00000f19  2**0
+  7 .debug_line   00000315  00000000  00000000  000010e3  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000024  00000000  00000000  00001174  2**2
+  8 .debug_frame  00000024  00000000  00000000  000013f8  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000003ca  00000000  00000000  00001198  2**0
+  9 .debug_str    000003e4  00000000  00000000  0000141c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000010  00000000  00000000  00001562  2**0
+ 10 .debug_loc    000001cc  00000000  00000000  00001800  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000010  00000000  00000000  000019cc  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -64,7 +66,7 @@ Disassembly of section .text:
   70:	de bf       	out	0x3e, r29	; 62
   72:	cd bf       	out	0x3d, r28	; 61
   74:	0e 94 40 00 	call	0x80	; 0x80 <main>
-  78:	0c 94 50 00 	jmp	0xa0	; 0xa0 <_exit>
+  78:	0c 94 96 00 	jmp	0x12c	; 0x12c <_exit>
 
 0000007c <__bad_interrupt>:
   7c:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -75,38 +77,144 @@ Disassembly of section .text:
 
 int main(void)
 {
-	DDRD = (1<<PD0);
+	DDRD = (1 << PD0);
   80:	81 e0       	ldi	r24, 0x01	; 1
   82:	8a b9       	out	0x0a, r24	; 10
-	int time = 0;
-    /* Replace with your application code */
-	PORTD |= (1<<PD0);
-  84:	8b b1       	in	r24, 0x0b	; 11
-  86:	81 60       	ori	r24, 0x01	; 1
-  88:	8b b9       	out	0x0b, r24	; 11
-    while (1) 
-    {
-		PORTD ^= (1<<PD0);
-  8a:	9b b1       	in	r25, 0x0b	; 11
-  8c:	81 e0       	ldi	r24, 0x01	; 1
-  8e:	89 27       	eor	r24, r25
+
+	while (1)
+	{
+		for (int i = 0; i < 100; i++)
+  84:	40 e0       	ldi	r20, 0x00	; 0
+  86:	50 e0       	ldi	r21, 0x00	; 0
+  88:	44 36       	cpi	r20, 0x64	; 100
+  8a:	51 05       	cpc	r21, r1
+  8c:	2c f5       	brge	.+74     	; 0xd8 <main+0x58>
+		{
+
+			PORTD = (1 << PD0);
+  8e:	81 e0       	ldi	r24, 0x01	; 1
   90:	8b b9       	out	0x0b, r24	; 11
+
+			for (int j = 0; j < 100 - i; j++)
+  92:	20 e0       	ldi	r18, 0x00	; 0
+  94:	30 e0       	ldi	r19, 0x00	; 0
+  96:	84 e6       	ldi	r24, 0x64	; 100
+  98:	90 e0       	ldi	r25, 0x00	; 0
+  9a:	84 1b       	sub	r24, r20
+  9c:	95 0b       	sbc	r25, r21
+  9e:	28 17       	cp	r18, r24
+  a0:	39 07       	cpc	r19, r25
+  a2:	4c f4       	brge	.+18     	; 0xb6 <main+0x36>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
-  92:	87 ea       	ldi	r24, 0xA7	; 167
-  94:	91 e6       	ldi	r25, 0x61	; 97
-  96:	01 97       	sbiw	r24, 0x01	; 1
-  98:	f1 f7       	brne	.-4      	; 0x96 <main+0x16>
-  9a:	00 c0       	rjmp	.+0      	; 0x9c <main+0x1c>
-  9c:	00 00       	nop
-  9e:	f5 cf       	rjmp	.-22     	; 0x8a <main+0xa>
+  a4:	83 ef       	ldi	r24, 0xF3	; 243
+  a6:	91 e0       	ldi	r25, 0x01	; 1
+  a8:	01 97       	sbiw	r24, 0x01	; 1
+  aa:	f1 f7       	brne	.-4      	; 0xa8 <main+0x28>
+  ac:	00 c0       	rjmp	.+0      	; 0xae <main+0x2e>
+  ae:	00 00       	nop
+  b0:	2f 5f       	subi	r18, 0xFF	; 255
+  b2:	3f 4f       	sbci	r19, 0xFF	; 255
+  b4:	f0 cf       	rjmp	.-32     	; 0x96 <main+0x16>
+			_delay_us(500);
 
-000000a0 <_exit>:
-  a0:	f8 94       	cli
+			PORTD = 0;
+  b6:	1b b8       	out	0x0b, r1	; 11
 
-000000a2 <__stop_program>:
-  a2:	ff cf       	rjmp	.-2      	; 0xa2 <__stop_program>
+			for (int j = 0; j < i; j++)
+  b8:	80 e0       	ldi	r24, 0x00	; 0
+  ba:	90 e0       	ldi	r25, 0x00	; 0
+  bc:	84 17       	cp	r24, r20
+  be:	95 07       	cpc	r25, r21
+  c0:	44 f4       	brge	.+16     	; 0xd2 <main+0x52>
+  c2:	e3 ef       	ldi	r30, 0xF3	; 243
+  c4:	f1 e0       	ldi	r31, 0x01	; 1
+  c6:	31 97       	sbiw	r30, 0x01	; 1
+  c8:	f1 f7       	brne	.-4      	; 0xc6 <main+0x46>
+  ca:	00 c0       	rjmp	.+0      	; 0xcc <main+0x4c>
+  cc:	00 00       	nop
+  ce:	01 96       	adiw	r24, 0x01	; 1
+  d0:	f5 cf       	rjmp	.-22     	; 0xbc <main+0x3c>
+{
+	DDRD = (1 << PD0);
+
+	while (1)
+	{
+		for (int i = 0; i < 100; i++)
+  d2:	4f 5f       	subi	r20, 0xFF	; 255
+  d4:	5f 4f       	sbci	r21, 0xFF	; 255
+  d6:	d8 cf       	rjmp	.-80     	; 0x88 <main+0x8>
+  d8:	44 e6       	ldi	r20, 0x64	; 100
+  da:	50 e0       	ldi	r21, 0x00	; 0
+			for (int j = 0; j < i; j++)
+			_delay_us(500);
+		}
+		
+		
+		for (int i = 100; i > 0; i--)
+  dc:	14 16       	cp	r1, r20
+  de:	15 06       	cpc	r1, r21
+  e0:	8c f6       	brge	.-94     	; 0x84 <main+0x4>
+		{
+
+			PORTD = (1 << PD0);
+  e2:	81 e0       	ldi	r24, 0x01	; 1
+  e4:	8b b9       	out	0x0b, r24	; 11
+
+			for (int j = 0; j < 100 - i; j++)
+  e6:	20 e0       	ldi	r18, 0x00	; 0
+  e8:	30 e0       	ldi	r19, 0x00	; 0
+  ea:	84 e6       	ldi	r24, 0x64	; 100
+  ec:	90 e0       	ldi	r25, 0x00	; 0
+  ee:	84 1b       	sub	r24, r20
+  f0:	95 0b       	sbc	r25, r21
+  f2:	28 17       	cp	r18, r24
+  f4:	39 07       	cpc	r19, r25
+  f6:	4c f4       	brge	.+18     	; 0x10a <main+0x8a>
+  f8:	83 ef       	ldi	r24, 0xF3	; 243
+  fa:	91 e0       	ldi	r25, 0x01	; 1
+  fc:	01 97       	sbiw	r24, 0x01	; 1
+  fe:	f1 f7       	brne	.-4      	; 0xfc <main+0x7c>
+ 100:	00 c0       	rjmp	.+0      	; 0x102 <main+0x82>
+ 102:	00 00       	nop
+ 104:	2f 5f       	subi	r18, 0xFF	; 255
+ 106:	3f 4f       	sbci	r19, 0xFF	; 255
+ 108:	f0 cf       	rjmp	.-32     	; 0xea <main+0x6a>
+			_delay_us(500);
+
+			PORTD = 0;
+ 10a:	1b b8       	out	0x0b, r1	; 11
+
+			for (int j = 0; j < i; j++)
+ 10c:	80 e0       	ldi	r24, 0x00	; 0
+ 10e:	90 e0       	ldi	r25, 0x00	; 0
+ 110:	84 17       	cp	r24, r20
+ 112:	95 07       	cpc	r25, r21
+ 114:	44 f4       	brge	.+16     	; 0x126 <main+0xa6>
+ 116:	e3 ef       	ldi	r30, 0xF3	; 243
+ 118:	f1 e0       	ldi	r31, 0x01	; 1
+ 11a:	31 97       	sbiw	r30, 0x01	; 1
+ 11c:	f1 f7       	brne	.-4      	; 0x11a <main+0x9a>
+ 11e:	00 c0       	rjmp	.+0      	; 0x120 <main+0xa0>
+ 120:	00 00       	nop
+ 122:	01 96       	adiw	r24, 0x01	; 1
+ 124:	f5 cf       	rjmp	.-22     	; 0x110 <main+0x90>
+			for (int j = 0; j < i; j++)
+			_delay_us(500);
+		}
+		
+		
+		for (int i = 100; i > 0; i--)
+ 126:	41 50       	subi	r20, 0x01	; 1
+ 128:	51 09       	sbc	r21, r1
+ 12a:	d8 cf       	rjmp	.-80     	; 0xdc <main+0x5c>
+
+0000012c <_exit>:
+ 12c:	f8 94       	cli
+
+0000012e <__stop_program>:
+ 12e:	ff cf       	rjmp	.-2      	; 0x12e <__stop_program>
