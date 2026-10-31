@@ -1,0 +1,203 @@
+
+Oppgave_7_6.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         00000002  00800100  00000116  0000018a  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         00000116  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .comment      00000030  00000000  00000000  0000018c  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001bc  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000028  00000000  00000000  000001f8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000745  00000000  00000000  00000220  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 0000069e  00000000  00000000  00000965  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   000002ab  00000000  00000000  00001003  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000050  00000000  00000000  000012b0  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000444  00000000  00000000  00001300  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    000000c0  00000000  00000000  00001744  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000018  00000000  00000000  00001804  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 34 00 	jmp	0x68	; 0x68 <__ctors_end>
+   4:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+   8:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+   c:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  10:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  14:	0c 94 63 00 	jmp	0xc6	; 0xc6 <__vector_5>
+  18:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  1c:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  20:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  24:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  28:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  2c:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  30:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  34:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  38:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  3c:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  40:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  44:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  48:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  4c:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  50:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  54:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  58:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  5c:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  60:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+  64:	0c 94 49 00 	jmp	0x92	; 0x92 <__bad_interrupt>
+
+00000068 <__ctors_end>:
+  68:	11 24       	eor	r1, r1
+  6a:	1f be       	out	0x3f, r1	; 63
+  6c:	cf ef       	ldi	r28, 0xFF	; 255
+  6e:	d4 e0       	ldi	r29, 0x04	; 4
+  70:	de bf       	out	0x3e, r29	; 62
+  72:	cd bf       	out	0x3d, r28	; 61
+
+00000074 <__do_copy_data>:
+  74:	11 e0       	ldi	r17, 0x01	; 1
+  76:	a0 e0       	ldi	r26, 0x00	; 0
+  78:	b1 e0       	ldi	r27, 0x01	; 1
+  7a:	e6 e1       	ldi	r30, 0x16	; 22
+  7c:	f1 e0       	ldi	r31, 0x01	; 1
+  7e:	02 c0       	rjmp	.+4      	; 0x84 <__do_copy_data+0x10>
+  80:	05 90       	lpm	r0, Z+
+  82:	0d 92       	st	X+, r0
+  84:	a2 30       	cpi	r26, 0x02	; 2
+  86:	b1 07       	cpc	r27, r17
+  88:	d9 f7       	brne	.-10     	; 0x80 <__do_copy_data+0xc>
+  8a:	0e 94 4b 00 	call	0x96	; 0x96 <main>
+  8e:	0c 94 89 00 	jmp	0x112	; 0x112 <_exit>
+
+00000092 <__bad_interrupt>:
+  92:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+00000096 <main>:
+// ################################################
+
+int main(void)
+{
+	// LED på PD0, aktiv LAV
+	PORTD |= (1 << PD0);     // LED av
+  96:	8b b1       	in	r24, 0x0b	; 11
+  98:	81 60       	ori	r24, 0x01	; 1
+  9a:	8b b9       	out	0x0b, r24	; 11
+	DDRD  |= (1 << PD0);     // PD0 som utgang
+  9c:	8a b1       	in	r24, 0x0a	; 10
+  9e:	81 60       	ori	r24, 0x01	; 1
+  a0:	8a b9       	out	0x0a, r24	; 10
+
+	// Knapp på PD1 koblet til GND
+	DDRD  &= ~(1 << PD1);    // PD1 som inngang
+  a2:	8a b1       	in	r24, 0x0a	; 10
+  a4:	8d 7f       	andi	r24, 0xFD	; 253
+  a6:	8a b9       	out	0x0a, r24	; 10
+	PORTD |= (1 << PD1);     // Aktiver intern pull-up
+  a8:	8b b1       	in	r24, 0x0b	; 11
+  aa:	82 60       	ori	r24, 0x02	; 2
+  ac:	8b b9       	out	0x0b, r24	; 11
+
+	// Aktiver pin-change interrupt for Port D
+	PCICR |= (1 << PCIE2);
+  ae:	e8 e6       	ldi	r30, 0x68	; 104
+  b0:	f0 e0       	ldi	r31, 0x00	; 0
+  b2:	80 81       	ld	r24, Z
+  b4:	84 60       	ori	r24, 0x04	; 4
+  b6:	80 83       	st	Z, r24
+
+	// Aktiver interrupt spesifikt for PD1 / PCINT17
+	PCMSK2 |= (1 << PCINT17);
+  b8:	ed e6       	ldi	r30, 0x6D	; 109
+  ba:	f0 e0       	ldi	r31, 0x00	; 0
+  bc:	80 81       	ld	r24, Z
+  be:	82 60       	ori	r24, 0x02	; 2
+  c0:	80 83       	st	Z, r24
+
+	// Aktiver interrupts globalt
+	sei();
+  c2:	78 94       	sei
+  c4:	ff cf       	rjmp	.-2      	; 0xc4 <main+0x2e>
+
+000000c6 <__vector_5>:
+}
+
+
+// Kjøres når signalet på PD1 endrer seg
+ISR(PCINT2_vect)
+{
+  c6:	1f 92       	push	r1
+  c8:	0f 92       	push	r0
+  ca:	0f b6       	in	r0, 0x3f	; 63
+  cc:	0f 92       	push	r0
+  ce:	11 24       	eor	r1, r1
+  d0:	2f 93       	push	r18
+  d2:	8f 93       	push	r24
+  d4:	9f 93       	push	r25
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+  d6:	8f e3       	ldi	r24, 0x3F	; 63
+  d8:	9c e9       	ldi	r25, 0x9C	; 156
+  da:	01 97       	sbiw	r24, 0x01	; 1
+  dc:	f1 f7       	brne	.-4      	; 0xda <__vector_5+0x14>
+  de:	00 c0       	rjmp	.+0      	; 0xe0 <__vector_5+0x1a>
+  e0:	00 00       	nop
+	static uint8_t previousButtonState = 1;
+
+	_delay_ms(20); // Debounce
+
+	uint8_t currentButtonState =
+	(PIND & (1 << PD1)) ? 1 : 0;
+  e2:	49 9b       	sbis	0x09, 1	; 9
+  e4:	02 c0       	rjmp	.+4      	; 0xea <__vector_5+0x24>
+  e6:	81 e0       	ldi	r24, 0x01	; 1
+  e8:	01 c0       	rjmp	.+2      	; 0xec <__vector_5+0x26>
+  ea:	80 e0       	ldi	r24, 0x00	; 0
+
+	if ((previousButtonState == 1) &&
+  ec:	90 91 00 01 	lds	r25, 0x0100	; 0x800100 <__DATA_REGION_ORIGIN__>
+  f0:	91 30       	cpi	r25, 0x01	; 1
+  f2:	29 f4       	brne	.+10     	; 0xfe <__vector_5+0x38>
+  f4:	81 11       	cpse	r24, r1
+  f6:	03 c0       	rjmp	.+6      	; 0xfe <__vector_5+0x38>
+	(currentButtonState == 0))
+	{
+		PORTD ^= (1 << PD0);
+  f8:	2b b1       	in	r18, 0x0b	; 11
+  fa:	92 27       	eor	r25, r18
+  fc:	9b b9       	out	0x0b, r25	; 11
+	}
+
+	previousButtonState = currentButtonState;
+  fe:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+	// ################################################
+}
+ 102:	9f 91       	pop	r25
+ 104:	8f 91       	pop	r24
+ 106:	2f 91       	pop	r18
+ 108:	0f 90       	pop	r0
+ 10a:	0f be       	out	0x3f, r0	; 63
+ 10c:	0f 90       	pop	r0
+ 10e:	1f 90       	pop	r1
+ 110:	18 95       	reti
+
+00000112 <_exit>:
+ 112:	f8 94       	cli
+
+00000114 <__stop_program>:
+ 114:	ff cf       	rjmp	.-2      	; 0x114 <__stop_program>
