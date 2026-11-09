@@ -12,8 +12,11 @@ CAN_message_t receivedMessage;
 CAN_message_t sentMessage;
 
 
-unsigned long lastSentTime = 0; // Tiden når siste melding ble sendt.
-const unsigned long messageSendInterval = 1000; // Tid programmet skal vente før den sender en ny melding
+unsigned long lastSentTime{0}; // Tiden når siste melding ble sendt.
+const unsigned long messageSendInterval{1000}; // Tid programmet skal vente før den sender en ny melding
+
+unsigned long lastDispUpdateTime{0}; // Tiden når display var oppdatert sist.
+constexpr unsigned long dispUpdateInterval{100}; // OLED-skjermen oppdateringsintervalle er 100. millisekund
 
 // Verdier som skal skrives ut på OLED skjermen
 int messagesReceivedCounter{0};
@@ -87,7 +90,7 @@ void setup() {
 void loop() {
   // millis() - gir tiden fra øyeblikket Teensy startet. 
   // Koden kjører når millis() er større enn tiden (når siste meldingen ble sent + interval)
-  if (millis() > lastSentTime + messageSendInterval){
+  if (millis() - lastSentTime >= messageSendInterval){
       can0.write(sentMessage);
       lastSentTime = millis();
   }
@@ -131,51 +134,56 @@ void loop() {
     Serial.println();
   }
 
-  display.clearDisplay();
- 
-  display.setCursor(27, 5);
-  display.print("MAS - Gruppe 2");
+  // Skjermen skal oppdateres hver 100 millesekund
+  if (millis() - lastDispUpdateTime >= dispUpdateInterval){
+    lastDispUpdateTime = millis();
 
-  // Tegner en avrundet rektangel
-  display.drawRoundRect(0,0,screenWidth,screenHeight,5,WHITE);
+    display.clearDisplay();
+  
+    display.setCursor(27, 5);
+    display.print("MAS - Gruppe 2");
 
-  display.setCursor(10, 25);
-  display.print("CAN - statistikk");    // Printer en tekst på OLED-en
+    // Tegner en avrundet rektangel
+    display.drawRoundRect(0,0,screenWidth,screenHeight,5,WHITE);
 
-  // Tegner en striplete linje
-  bool wb_toggle{true};
-  int count{0};
-  for (int i = 10; i < screenWidth-10; i++){
-    if (wb_toggle == true){
-      display.drawPixel(i,37, WHITE);
-    } else {
-      display.drawPixel(i,37, BLACK);
-    }
-    if (count == 5){
-      count = 0;
-      if (wb_toggle == false){
-        wb_toggle = true;
+    display.setCursor(10, 25);
+    display.print("CAN - statistikk");    // Printer en tekst på OLED-en
+
+    // Tegner en striplete linje
+    bool wb_toggle{true};
+    int count{0};
+    for (int i = 10; i < screenWidth-10; i++){
+      if (wb_toggle == true){
+        display.drawPixel(i,37, WHITE);
       } else {
-        wb_toggle = false;
+        display.drawPixel(i,37, BLACK);
       }
+      if (count == 5){
+        count = 0;
+        if (wb_toggle == false){
+          wb_toggle = true;
+        } else {
+          wb_toggle = false;
+        }
+      }
+      count++;
     }
-    count++;
+
+    display.setCursor(10, 42);
+    display.print("Antall mottatt:");
+    display.setCursor(100, 42);
+    display.print(messagesReceivedCounter);
+
+    display.setCursor(10, 52);
+    display.print("Mottok sist ID:");
+    display.setCursor(100, 52);
+    display.print(messagesReceivedID, HEX);
+
+    // Tegner en kurve under tekst
+    for (int i = -20; i < 20; i++){
+      display.drawPixel(i + 64, 20 - (i * i) / 85, WHITE);
+    }
+
+    display.display();
   }
-
-  display.setCursor(10, 42);
-  display.print("Antall mottatt:");
-  display.setCursor(100, 42);
-  display.print(messagesReceivedCounter);
-
-  display.setCursor(10, 52);
-  display.print("Mottok sist ID:");
-  display.setCursor(100, 52);
-  display.print(messagesReceivedID, HEX);
-
-  // Tegner en kurve under tekst
-  for (int i = -20; i < 20; i++){
-    display.drawPixel(i + 64, 20 - (i * i) / 85, WHITE);
-  }
-
-  display.display();
 }
