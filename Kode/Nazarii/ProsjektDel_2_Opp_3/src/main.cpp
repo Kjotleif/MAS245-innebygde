@@ -15,6 +15,10 @@ CAN_message_t sentMessage;
 unsigned long lastSentTime = 0; // Tiden når siste melding ble sendt.
 const unsigned long messageSendInterval = 1000; // Tid programmet skal vente før den sender en ny melding
 
+// Verdier som skal skrives ut på OLED skjermen
+int messagesReceivedCounter{0};
+int messagesReceivedID{0};
+
 // Bredden og høyden i piksler på OLED skjermen
 constexpr uint8_t screenWidth{128}; 
 constexpr uint8_t screenHeight{64};
@@ -100,6 +104,9 @@ void loop() {
       }
       Serial.println(); // Går til neste linje
 
+      messagesReceivedCounter++;
+      messagesReceivedID = receivedMessage.id;
+
       can0.write(receivedMessage);
       // Melding var returnert
   }
@@ -136,10 +143,14 @@ void loop() {
   }
 
   display.setCursor(10, 42);
-  display.print("Antall mottatt: 0");
+  display.print("Antall mottatt:");
+  display.setCursor(100, 42);
+  display.print(messagesReceivedCounter);
 
   display.setCursor(10, 52);
-  display.print("Mottok sist ID: 000");
+  display.print("Mottok sist ID:");
+  display.setCursor(100, 52);
+  display.print(messagesReceivedID, HEX);
 
   // Tegner en kurve under tekst
   for (int i = -20; i < 20; i++){
