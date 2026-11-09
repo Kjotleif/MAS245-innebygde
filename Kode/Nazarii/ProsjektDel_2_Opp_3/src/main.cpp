@@ -43,6 +43,35 @@ void setup() {
   // Tegner en avrundet rektangel
   display.drawRoundRect(0,0,screenWidth,screenHeight,5,WHITE);
 
+  display.setCursor(10, 25);
+  display.print("CAN - statistikk");    // Printer en tekst på OLED-en
+
+  // Tegner en striplete linje
+  bool wb_toggle{true};
+  int count{0};
+  for (int i = 10; i < screenWidth-10; i++){
+    if (wb_toggle == true){
+      display.drawPixel(i,37, WHITE);
+    } else {
+      display.drawPixel(i,37, BLACK);
+    }
+    if (count == 5){
+      count = 0;
+      if (wb_toggle == false){
+        wb_toggle = true;
+      } else {
+        wb_toggle = false;
+      }
+    }
+    count++;
+  }
+
+  display.setCursor(10, 42);
+  display.print("Antall mottatt: 0");
+
+  display.setCursor(10, 52);
+  display.print("Mottok sist ID: 000");
+
   display.display();
 }
 
