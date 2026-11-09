@@ -28,6 +28,10 @@ constexpr uint8_t Dc = 6;     // Data/Command koblet til pinne nr. 6
 constexpr uint8_t Reset = 5;  // RESET er koblet til pinne nr. 5
 constexpr uint8_t Cs = 10;    // Chip Select koblet til pinne nr. 10
 
+// Her defineres pinner på Teensy som er koblet til joystick
+constexpr uint8_t joystickUp = 22;
+constexpr uint8_t joystickDown = 23;
+
 // Oppretter et displayobjekt som får de allerede definerte parametrene:
 Adafruit_SSD1306 display(
   screenWidth,
@@ -72,6 +76,10 @@ void setup() {
 
   display.setTextSize(1);
   display.setTextColor(WHITE);
+
+  // Aktiverer interne pull-up motstandene til joystick
+  pinMode(joystickUp, INPUT_PULLUP);
+  pinMode(joystickDown, INPUT_PULLUP);
 }
 
 
@@ -109,6 +117,18 @@ void loop() {
 
       can0.write(receivedMessage);
       // Melding var returnert
+  }
+
+  // Joystick logikken
+  if (digitalRead(joystickDown) == LOW)
+  {
+    Serial.print("Going down."); 
+    Serial.println();   
+  } 
+  else if (digitalRead(joystickUp) == LOW)
+  {
+    Serial.print("Going up.");
+    Serial.println();
   }
 
   display.clearDisplay();
