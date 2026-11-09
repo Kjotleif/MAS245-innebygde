@@ -72,6 +72,11 @@ void setup() {
   display.setCursor(10, 52);
   display.print("Mottok sist ID: 000");
 
+  // Tegner en kurve under tekst
+  for (int i = -20; i < 20; i++){
+    display.drawPixel(i + 64, 20 - (i * i) / 85, WHITE);
+  }
+
   display.display();
 }
 
