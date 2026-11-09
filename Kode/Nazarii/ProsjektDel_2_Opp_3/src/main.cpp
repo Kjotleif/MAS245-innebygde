@@ -18,6 +18,9 @@ const unsigned long messageSendInterval{1000}; // Tid programmet skal vente før
 unsigned long lastDispUpdateTime{0}; // Tiden når display var oppdatert sist.
 constexpr unsigned long dispUpdateInterval{100}; // OLED-skjermen oppdateringsintervalle er 100. millisekund
 
+unsigned long lastTimeJoystickMove{0}; // Tiden når bilde reagerte siste gang på joystick
+constexpr unsigned long joystickMoveInterval{50}; // Bildet reagerer på signal fra joystick hver 50 millesekund
+
 // Verdier som skal skrives ut på OLED skjermen
 int messagesReceivedCounter{0};
 int messagesReceivedID{0};
@@ -34,6 +37,9 @@ constexpr uint8_t Cs = 10;    // Chip Select koblet til pinne nr. 10
 // Her defineres pinner på Teensy som er koblet til joystick
 constexpr uint8_t joystickUp = 22;
 constexpr uint8_t joystickDown = 23;
+
+// Vertikal posisjonen til bildet på skjermen
+long pictureYPOS{0};
 
 // Oppretter et displayobjekt som får de allerede definerte parametrene:
 Adafruit_SSD1306 display(
@@ -122,17 +128,23 @@ void loop() {
       // Melding var returnert
   }
 
-  // Joystick logikken
-  if (digitalRead(joystickDown) == LOW)
-  {
-    Serial.print("Going down."); 
-    Serial.println();   
-  } 
-  else if (digitalRead(joystickUp) == LOW)
-  {
-    Serial.print("Going up.");
-    Serial.println();
+  // Joystick logikken som kjører med en gitt interval på 100 millesekund
+  if (millis() - lastTimeJoystickMove >= joystickMoveInterval){
+    lastTimeJoystickMove = millis();
+    if (digitalRead(joystickDown) == LOW)
+    {
+      Serial.print("Going down."); 
+      Serial.println();   
+      pictureYPOS++;
+    } 
+    else if (digitalRead(joystickUp) == LOW)
+    {
+      Serial.print("Going up.");
+      Serial.println();
+      pictureYPOS--;
+    }
   }
+  
 
   // Skjermen skal oppdateres hver 100 millesekund
   if (millis() - lastDispUpdateTime >= dispUpdateInterval){
@@ -140,13 +152,13 @@ void loop() {
 
     display.clearDisplay();
   
-    display.setCursor(27, 5);
+    display.setCursor(27, 5 + pictureYPOS);
     display.print("MAS - Gruppe 2");
 
     // Tegner en avrundet rektangel
-    display.drawRoundRect(0,0,screenWidth,screenHeight,5,WHITE);
+    display.drawRoundRect(0,0 + pictureYPOS,screenWidth,screenHeight,5,WHITE);
 
-    display.setCursor(10, 25);
+    display.setCursor(10, 25 + pictureYPOS);
     display.print("CAN - statistikk");    // Printer en tekst på OLED-en
 
     // Tegner en striplete linje
@@ -154,9 +166,9 @@ void loop() {
     int count{0};
     for (int i = 10; i < screenWidth-10; i++){
       if (wb_toggle == true){
-        display.drawPixel(i,37, WHITE);
+        display.drawPixel(i,37 + pictureYPOS, WHITE);
       } else {
-        display.drawPixel(i,37, BLACK);
+        display.drawPixel(i,37 + pictureYPOS, BLACK);
       }
       if (count == 5){
         count = 0;
@@ -169,19 +181,19 @@ void loop() {
       count++;
     }
 
-    display.setCursor(10, 42);
+    display.setCursor(10, 42 + pictureYPOS);
     display.print("Antall mottatt:");
-    display.setCursor(100, 42);
+    display.setCursor(100, 42 + pictureYPOS);
     display.print(messagesReceivedCounter);
 
-    display.setCursor(10, 52);
+    display.setCursor(10, 52 + pictureYPOS);
     display.print("Mottok sist ID:");
-    display.setCursor(100, 52);
+    display.setCursor(100, 52 + pictureYPOS);
     display.print(messagesReceivedID, HEX);
 
     // Tegner en kurve under tekst
     for (int i = -20; i < 20; i++){
-      display.drawPixel(i + 64, 20 - (i * i) / 85, WHITE);
+      display.drawPixel(i + 64, 20 - (i * i) / 85 + pictureYPOS, WHITE);
     }
 
     display.display();
