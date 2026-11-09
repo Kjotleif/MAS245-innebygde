@@ -37,8 +37,11 @@ void setup() {
 
   display.clearDisplay();
  
-  display.setCursor(0, 0);
+  display.setCursor(27, 5);
   display.print("MAS - Gruppe 2");
+
+  // Tegner en avrundet rektangel
+  display.drawRoundRect(0,0,screenWidth,screenHeight,5,WHITE);
 
   display.display();
 }
