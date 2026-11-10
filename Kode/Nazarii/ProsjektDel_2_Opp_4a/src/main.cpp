@@ -51,7 +51,7 @@ constexpr uint8_t joystickDown = 23;
 
 // Vertikal posisjonen til bildet på skjermen
 long pictureYPos{0};
-long pictureYPosMin{-30};
+long pictureYPosMin{-65};
 long pictureYPosMax{0};
 
 // Oppretter et displayobjekt som får de allerede definerte parametrene:
@@ -63,6 +63,11 @@ Adafruit_SSD1306 display(
   Reset,
   Cs
 );
+
+// Akselerasjon fra IMU
+float accelerationX{0};
+float accelerationY{0};
+float accelerationZ{0};
 
 void setup() {
   Wire1.begin();  // Starter grensesnittet Wire1
@@ -122,9 +127,9 @@ void loop() {
 
     xyzFloat acceleration = imu.getGValues();
     // IMU gir akselerasjon i g verdier. For å få m/s^2 må man gange med 9.81 
-    float accelerationX = acceleration.x * 9.81;
-    float accelerationY = acceleration.y * 9.81;
-    float accelerationZ = acceleration.z * 9.81;
+    accelerationX = acceleration.x * 9.81;
+    accelerationY = acceleration.y * 9.81;
+    accelerationZ = acceleration.z * 9.81;
 
 
     Serial.print("Akselerasjon X: ");
@@ -204,19 +209,21 @@ void loop() {
     // Tegner en avrundet rektangel
     display.drawRoundRect(0,0 + pictureYPos,screenWidth,screenHeight + (pictureYPosMin * (-1)),5,WHITE);
 
-    display.setCursor(10, 25 + pictureYPos);
+    display.setCursor(5, 25 + pictureYPos);
     display.print("CAN - statistikk");    // Printer en tekst på OLED-en
 
-    // Tegner to striplete linje på to forskjellige y posisjoner
+    // Tegner tre striplete linje på tre forskjellige y posisjoner
     bool wb_toggle{true};
     int count{0};
-    for (int i = 10; i < screenWidth-10; i++){
+    for (int i = 5; i < screenWidth-10; i++){
       if (wb_toggle == true){
         display.drawPixel(i,37 + pictureYPos, WHITE);
         display.drawPixel(i,62 + pictureYPos, WHITE);
+        display.drawPixel(i,87 + pictureYPos, WHITE);
       } else {
         display.drawPixel(i,37 + pictureYPos, BLACK);
         display.drawPixel(i,62 + pictureYPos, BLACK);
+        display.drawPixel(i,87 + pictureYPos, BLACK);
       }
       if (count == 5){
         count = 0;
@@ -229,25 +236,40 @@ void loop() {
       count++;
     }
 
-    display.setCursor(10, 42 + pictureYPos);
+    display.setCursor(5, 42 + pictureYPos);
     display.print("Antall mottatt:");
-    display.setCursor(100, 42 + pictureYPos);
+    display.setCursor(95, 42 + pictureYPos);
     display.print(messagesReceivedCounter);
 
-    display.setCursor(10, 52 + pictureYPos);
+    display.setCursor(5, 52 + pictureYPos);
     display.print("Mottok sist ID:");
-    display.setCursor(100, 52 + pictureYPos);
+    display.setCursor(95, 52 + pictureYPos);
     display.print(messagesReceivedID, HEX);
 
-    display.setCursor(10, 67 + pictureYPos);
+    display.setCursor(5, 67 + pictureYPos);
     display.print("Antall sendt:");
-    display.setCursor(100, 67 + pictureYPos);
+    display.setCursor(95, 67 + pictureYPos);
     display.print(messagesSentCounter);
 
-    display.setCursor(10, 77 + pictureYPos);
+    display.setCursor(5, 77 + pictureYPos);
     display.print("Sendt sist ID:");
-    display.setCursor(100, 77 + pictureYPos);
+    display.setCursor(95, 77 + pictureYPos);
     display.print(messageSentID, HEX);
+
+    display.setCursor(5, 92 + pictureYPos);
+    display.print("Akselerasjon X:");
+    display.setCursor(95, 92 + pictureYPos);
+    display.print(accelerationX);
+
+    display.setCursor(5, 102 + pictureYPos);
+    display.print("Akselerasjon Y:");
+    display.setCursor(95, 102 + pictureYPos);
+    display.print(accelerationY);
+
+    display.setCursor(5, 112 + pictureYPos);
+    display.print("Akselerasjon Z:");
+    display.setCursor(95, 112 + pictureYPos);
+    display.print(accelerationZ);
 
     // Tegner en kurve under tekst
     for (int i = -20; i < 20; i++){
