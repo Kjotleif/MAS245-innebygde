@@ -24,6 +24,8 @@ constexpr unsigned long joystickMoveInterval{50}; // Bildet reagerer på signal 
 // Verdier som skal skrives ut på OLED skjermen
 int messagesReceivedCounter{0};
 int messagesReceivedID{0};
+int messagesSentCounter{0};
+int messageSentID{0};
 
 // Bredden og høyden i piksler på OLED skjermen
 constexpr uint8_t screenWidth{128}; 
@@ -39,7 +41,9 @@ constexpr uint8_t joystickUp = 22;
 constexpr uint8_t joystickDown = 23;
 
 // Vertikal posisjonen til bildet på skjermen
-long pictureYPOS{0};
+long pictureYPos{0};
+long pictureYPosMin{-30};
+long pictureYPosMax{0};
 
 // Oppretter et displayobjekt som får de allerede definerte parametrene:
 Adafruit_SSD1306 display(
@@ -99,6 +103,8 @@ void loop() {
   if (millis() - lastSentTime >= messageSendInterval){
       can0.write(sentMessage);
       lastSentTime = millis();
+      messagesSentCounter++;
+      messageSentID = sentMessage.id;
   }
   // Vi har delay for at koden skal sende meldinger med jevne mellomrom og ikke overbelaste CAN bus
 
@@ -131,17 +137,18 @@ void loop() {
   // Joystick logikken som kjører med en gitt interval på 100 millesekund
   if (millis() - lastTimeJoystickMove >= joystickMoveInterval){
     lastTimeJoystickMove = millis();
-    if (digitalRead(joystickDown) == LOW)
-    {
-      Serial.print("Going down."); 
-      Serial.println();   
-      pictureYPOS++;
+    if (digitalRead(joystickUp) == LOW)
+    {  
+      if (pictureYPos < pictureYPosMax) {
+        pictureYPos++;
+      }  
     } 
-    else if (digitalRead(joystickUp) == LOW)
+    else if (digitalRead(joystickDown) == LOW)
     {
-      Serial.print("Going up.");
-      Serial.println();
-      pictureYPOS--;
+      if (pictureYPos > pictureYPosMin){
+        pictureYPos--;
+      }
+      
     }
   }
   
@@ -152,23 +159,25 @@ void loop() {
 
     display.clearDisplay();
   
-    display.setCursor(27, 5 + pictureYPOS);
+    display.setCursor(27, 5 + pictureYPos);
     display.print("MAS - Gruppe 2");
 
     // Tegner en avrundet rektangel
-    display.drawRoundRect(0,0 + pictureYPOS,screenWidth,screenHeight,5,WHITE);
+    display.drawRoundRect(0,0 + pictureYPos,screenWidth,screenHeight + (pictureYPosMin * (-1)),5,WHITE);
 
-    display.setCursor(10, 25 + pictureYPOS);
+    display.setCursor(10, 25 + pictureYPos);
     display.print("CAN - statistikk");    // Printer en tekst på OLED-en
 
-    // Tegner en striplete linje
+    // Tegner to striplete linje på to forskjellige y posisjoner
     bool wb_toggle{true};
     int count{0};
     for (int i = 10; i < screenWidth-10; i++){
       if (wb_toggle == true){
-        display.drawPixel(i,37 + pictureYPOS, WHITE);
+        display.drawPixel(i,37 + pictureYPos, WHITE);
+        display.drawPixel(i,62 + pictureYPos, WHITE);
       } else {
-        display.drawPixel(i,37 + pictureYPOS, BLACK);
+        display.drawPixel(i,37 + pictureYPos, BLACK);
+        display.drawPixel(i,62 + pictureYPos, BLACK);
       }
       if (count == 5){
         count = 0;
@@ -181,19 +190,29 @@ void loop() {
       count++;
     }
 
-    display.setCursor(10, 42 + pictureYPOS);
+    display.setCursor(10, 42 + pictureYPos);
     display.print("Antall mottatt:");
-    display.setCursor(100, 42 + pictureYPOS);
+    display.setCursor(100, 42 + pictureYPos);
     display.print(messagesReceivedCounter);
 
-    display.setCursor(10, 52 + pictureYPOS);
+    display.setCursor(10, 52 + pictureYPos);
     display.print("Mottok sist ID:");
-    display.setCursor(100, 52 + pictureYPOS);
+    display.setCursor(100, 52 + pictureYPos);
     display.print(messagesReceivedID, HEX);
+
+    display.setCursor(10, 67 + pictureYPos);
+    display.print("Antall sendt:");
+    display.setCursor(100, 67 + pictureYPos);
+    display.print(messagesSentCounter);
+
+    display.setCursor(10, 77 + pictureYPos);
+    display.print("Sendt sist ID:");
+    display.setCursor(100, 77 + pictureYPos);
+    display.print(messageSentID, HEX);
 
     // Tegner en kurve under tekst
     for (int i = -20; i < 20; i++){
-      display.drawPixel(i + 64, 20 - (i * i) / 85 + pictureYPOS, WHITE);
+      display.drawPixel(i + 64, 20 - (i * i) / 85 + pictureYPos, WHITE);
     }
 
     display.display();
