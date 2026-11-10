@@ -23,5 +23,20 @@ void setup() {
 }
 
 void loop() {
+  xyzFloat acceleration = imu.getGValues();
+  // IMU gir akselerasjon i g verdier. For å få m/s^2 må man gange med 9.81 
+  float accelerationX = acceleration.x * 9.81;
+  float accelerationY = acceleration.y * 9.81;
+  float accelerationZ = acceleration.z * 9.81;
+
+
+  Serial.print("Akselerasjon X: ");
+  Serial.println(accelerationX);
+
+  Serial.print("Akselerasjon Y: ");
+  Serial.println(accelerationY);
+
+  Serial.print("Akselerasjon Z: ");
+  Serial.println(accelerationZ);
 }
 
