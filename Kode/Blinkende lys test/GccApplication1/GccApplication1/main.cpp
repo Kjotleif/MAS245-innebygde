@@ -1,49 +1,52 @@
 /*
- * GccApplication1.cpp
+ * GccApplication2.cpp
  *
- * Created: 21.10.2026 10:35:53
+ * Created: 17.11.2026 00:17:45
  * Author : isakk
  */ 
 
-#define F_CPU 4000000UL
+#include <avr/io.h>
+
+#define F_CPU 8000000UL
+
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdint.h>
 
+constexpr uint32_t valgtFrekvens = 200; // Her velges det en passende frekvens slik at LEDen ikke flimrer
+
+constexpr double periode = 1000000.0 / valgtFrekvens;
+
+void diyDelay(us){
+    for (int i = 0; i < us; i++){
+    _delay_us(1)
+    }
+}
 
 int main(void)
 {
-	DDRD = (1 << PD0);
+    PORTD |= (1 << PD0); // siden pin PD0 skal sinke skal den først settes HØY for at LEDen skal være av
+    DDRD |= (1 << PD0);
 
-	while (1)
-	{
-		for (int i = 0; i < 100; i++)
-		{
+while (1){
+    for (int u = 0; u<100; u++){
+        for (int i = 0; i < static_cast<int>(valgtFrekvens)*0.1; i++){
+            PORTD &= ~(1 << PD0); // LED paa
+            diyDelay(periode*u/100);
 
-			PORTD = (1 << PD0);
+            PORTD |= (1 << PD0);  // LED av
+            diyDelay(periode*(100-u)/100);
+        }
+    }
 
-			for (int j = 0; j < 100 - i; j++)
-			_delay_us(500);
+    for (int u = 100; u>0; u--){
+        for (int i = 0; i < static_cast<int>(valgtFrekvens); i++){
+            PORTD &= ~(1 << PD0); // LED paa
+            diyDelay(periode*u/100);
 
-			PORTD = 0;
-
-			for (int j = 0; j < i; j++)
-			_delay_us(500);
-		}
-		
-		
-		for (int i = 100; i > 0; i--)
-		{
-
-			PORTD = (1 << PD0);
-
-			for (int j = 0; j < 100 - i; j++)
-			_delay_us(500);
-
-			PORTD = 0;
-
-			for (int j = 0; j < i; j++)
-			_delay_us(500);
-		}
-	}
+            PORTD |= (1 << PD0);  // LED av
+            diyDelay(periode*(100-u)/100);
+        }
+    }
 }
-
+}
